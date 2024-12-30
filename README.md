@@ -2,7 +2,9 @@
 
 ## Algorithms
 
-### 1. Initialize Data Structures
+### A* Algorithm Pseudocode
+
+#### 1. Initialize Data Structures
 
 - Retrieve `nodes` and `adjacencyList` from the `graph`.
 - Find the `startNode` and `endNode` using their IDs (`start` and `end`).
@@ -15,7 +17,7 @@
 
 ---
 
-### 2. While `openSet` is Not Empty
+#### 2. While `openSet` is Not Empty
 
 1. Extract the node `current` with the lowest `fScore` from `openSet`.
 
@@ -33,7 +35,7 @@
 
 ---
 
-### 3. Path Reconstruction
+#### 3. Path Reconstruction
 
 1. If `previous` does not contain a path to `end`, return an empty list (no path exists).
 2. Start from `end` and backtrack using `previous` to build the path:
@@ -42,7 +44,51 @@
 
 ---
 
-### 4. Return the Result
+#### 4. Return the Result
+
+- Return the reconstructed `path`.
+- Record and return the execution time for performance metrics.
+
+---
+
+### Dijkstra's Algorithm Pseudocode
+
+#### 1. Initialize Data Structures
+
+- Retrieve `nodes` and `adjacencyList` from the `graph`.
+- Find the `startNode` using its ID (`start`).
+
+- Create:
+  - A map `dist` to store the shortest distance from the `start` to each node. Initialize all values to `infinity` except for `start` (`dist[start] = 0`).
+  - A priority queue `pq` to store nodes to be explored, sorted by their distance. Add the `start` node with a distance of `0`.
+  - A map `previous` to store the parent of each node in the shortest path.
+
+---
+
+#### 2. While `pq` is Not Empty
+
+1. Extract the node `current` with the smallest distance from `pq`.
+
+2. Iterate over each `neighbor` of `current`:
+   - Compute `tentativeDist = dist[current] + edge.weight`.
+
+3. If `tentativeDist < dist[neighbor]`:
+   - Update `dist[neighbor] = tentativeDist`.
+   - Update `previous[neighbor] = current`.
+   - Add `neighbor` to `pq` with its updated distance.
+
+---
+
+#### 3. Path Reconstruction
+
+1. If `previous` does not contain a path to the target node, return an empty list (no path exists).
+2. Start from the target node and backtrack using `previous` to build the path:
+   - Add each node to the `path` until `start` is reached.
+3. Reverse the `path` to ensure it starts at `start` and ends at the target node.
+
+---
+
+#### 4. Return the Result
 
 - Return the reconstructed `path`.
 - Record and return the execution time for performance metrics.
@@ -54,8 +100,6 @@
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install build-essential cmake ninja-build graphviz
-
-
 ```
 
 ## Clone Repository

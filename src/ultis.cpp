@@ -1,6 +1,6 @@
 #include "ultis.h"
 
-const string DATA_FILE_PATH = "/home/dihnhuunam/Workspace/dsa-20241/test.txt";
+const string DATA_FILE_PATH = "/home/dihnhuunam/Workspace/Path-Finding-Algorithms/data.txt";
 
 /**
  * @brief Constructor for ConsoleTable class

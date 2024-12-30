@@ -8,13 +8,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-double Algorithms::lastExecutionTime = 0.0;
-
-double Algorithms::getLastExecutionTime()
-{
-    return lastExecutionTime;
-}
-
 /**
  * @brief Calculates the great-circle distance between two geographical points using the Euclidean formula
  * @param node1 First geographical point (latitude/longitude)
@@ -35,8 +28,6 @@ double Algorithms::calculateDistance(const Node &node1, const Node &node2)
  */
 vector<string> Algorithms::dijkstra(const Graph &graph, const string &start, const string &end)
 {
-    auto startTime = chrono::high_resolution_clock::now();
-
     // Retrieve nodes and adjacency list from the graph
     auto nodes = graph.getNodes();
     auto adjacencyList = graph.getAdjacencyList();
@@ -91,10 +82,6 @@ vector<string> Algorithms::dijkstra(const Graph &graph, const string &start, con
     path.push_back(start);
     reverse(path.begin(), path.end()); // Reverse the path to get it in the correct order
 
-    auto endTime = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime);
-    lastExecutionTime = duration.count() / 1000.0; // Record execution time
-
     return path;
 }
 
@@ -107,8 +94,6 @@ vector<string> Algorithms::dijkstra(const Graph &graph, const string &start, con
  */
 vector<string> Algorithms::astar(const Graph &graph, const string &start, const string &end)
 {
-    auto startTime = chrono::high_resolution_clock::now();
-
     auto nodes = graph.getNodes();
     auto adjacencyList = graph.getAdjacencyList();
 
@@ -178,79 +163,7 @@ vector<string> Algorithms::astar(const Graph &graph, const string &start, const 
     path.push_back(start);
     reverse(path.begin(), path.end());
 
-    auto endTime = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime);
-    lastExecutionTime = duration.count() / 1000.0; // Record execution time
-
     return path;
-}
-
-/**
- * @brief Helper function for DFS implementation
- * @param graph Graph containing nodes and edges
- * @param current Current node being explored
- * @param end Target node
- * @param visited Set of visited nodes
- * @param path Current path being built
- * @param finalPath Reference to store the final path if found
- * @return true if path is found, false otherwise
- */
-bool dfsHelper(const Graph &graph, const string &current, const string &end,
-               unordered_set<string> &visited, vector<string> &path,
-               vector<string> &finalPath)
-{
-    if (current == end)
-    {
-        finalPath = path;
-        return true;
-    }
-
-    visited.insert(current);
-    auto adjacencyList = graph.getAdjacencyList();
-
-    if (adjacencyList.find(current) != adjacencyList.end())
-    {
-        for (const auto &edge : adjacencyList.at(current))
-        {
-            string next = edge.to.id;
-            if (visited.find(next) == visited.end())
-            {
-                path.push_back(next);
-                if (dfsHelper(graph, next, end, visited, path, finalPath))
-                {
-                    return true;
-                }
-                path.pop_back();
-            }
-        }
-    }
-
-    return false;
-}
-
-/**
- * @brief Implements Depth-First Search (DFS) algorithm.
- * @param graph Graph containing nodes and edges.
- * @param start ID of the starting node.
- * @param end ID of the destination node.
- * @return Vector of node IDs representing the path, or empty if no path exists.
- */
-vector<string> Algorithms::dfs(const Graph &graph, const string &start, const string &end)
-{
-    auto startTime = chrono::high_resolution_clock::now();
-    unordered_set<string> visited;
-    vector<string> path = {start};
-    vector<string> finalPath;
-
-    if (dfsHelper(graph, start, end, visited, path, finalPath))
-    {
-        return finalPath;
-    }
-    auto endTime = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::microseconds>(endTime - startTime);
-    lastExecutionTime = duration.count() / 1000.0;
-
-    return vector<string>();
 }
 
 /**

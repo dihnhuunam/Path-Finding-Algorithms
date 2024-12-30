@@ -49,10 +49,9 @@ void Application::displayMenu()
     Row row1 = {"1. Display map information"};
     Row row2 = {"2. Find path using Dijkstra's algorithm"};
     Row row3 = {"3. Find path using A* algorithm"};
-    Row row4 = {"4. Find path using DFS algorithm"};
-    Row row5 = {"5. Compare all algorithms"};
-    Row row6 = {"6. Add new location"};
-    Row row7 = {"7. Exit"};
+    Row row4 = {"4. Compare all algorithms"};
+    Row row5 = {"5. Add new location"};
+    Row row6 = {"6. Exit"};
 
     table.AddNewRow(header);
     table.AddNewRow(row1);
@@ -61,7 +60,6 @@ void Application::displayMenu()
     table.AddNewRow(row4);
     table.AddNewRow(row5);
     table.AddNewRow(row6);
-    table.AddNewRow(row7);
 
     table.WriteTable(Align::Center);
     cout << "Enter your choice: ";
@@ -373,10 +371,6 @@ void Application::findPath(const string &algorithm, const string &source, const 
     {
         path = Algorithms::astar(hanoiMap, source, destination);
     }
-    else if (algorithm == "DFS")
-    {
-        path = Algorithms::dfs(hanoiMap, source, destination);
-    }
 
     if (!path.empty())
     {
@@ -392,22 +386,12 @@ void Application::findPath(const string &algorithm, const string &source, const 
         stringstream distanceStr;
         distanceStr << fixed << setprecision(1) << distance << " km";
 
-        double execTime = Algorithms::getLastExecutionTime();
-        stringstream timeStr;
-        timeStr << fixed << setprecision(2) << execTime << " ms";
-
         resultTable.AddNewRow({"Path: " + pathStr});
         resultTable.AddNewRow({"Total Distance: " + distanceStr.str()});
-        resultTable.AddNewRow({"Execution Time: " + timeStr.str()});
     }
     else
     {
         resultTable.AddNewRow({"No valid path found!"});
-
-        double execTime = Algorithms::getLastExecutionTime();
-        stringstream timeStr;
-        timeStr << fixed << setprecision(2) << execTime << " ms";
-        resultTable.AddNewRow({"Execution Time: " + timeStr.str()});
     }
 
     resultTable.WriteTable(Align::Left);
@@ -448,29 +432,20 @@ void Application::handleChoice(int choice)
 
     case 4:
     {
-        auto [source, destination] = getSourceAndDestinationWithHeader("DFS Algorithm Pathfinding");
+        auto [source, destination] = getSourceAndDestinationWithHeader("Algorithm Comparison");
         clearScreen();
-        findPath("DFS", source, destination);
+        findPath("Dijkstra", source, destination);
+        findPath("A*", source, destination);
         break;
     }
 
     case 5:
     {
-        auto [source, destination] = getSourceAndDestinationWithHeader("Algorithm Comparison");
-        clearScreen();
-        findPath("Dijkstra", source, destination);
-        findPath("A*", source, destination);
-        findPath("DFS", source, destination);
-        break;
-    }
-
-    case 6:
-    {
         addNewLocation();
         break;
     }
 
-    case 7:
+    case 6:
     {
         ConsoleTable exitTable(1);
         exitTable.AddNewRow({"Thank you for using the Hanoi Map Pathfinding System!"});
@@ -481,7 +456,7 @@ void Application::handleChoice(int choice)
     default:
     {
         ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Invalid choice! Please enter a number between 1 and 7."});
+        errorTable.AddNewRow({"Invalid choice! Please enter a number between 1 and 6."});
         errorTable.WriteTable(Align::Center);
         break;
     }
@@ -515,7 +490,7 @@ void Application::run()
         {
             clearScreen();
             ConsoleTable errorTable(1);
-            errorTable.AddNewRow({"Invalid input! Please enter a number between 1 and 7."});
+            errorTable.AddNewRow({"Invalid input! Please enter a number between 1 and 6."});
             errorTable.WriteTable(Align::Center);
             continue;
         }

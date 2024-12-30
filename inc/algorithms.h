@@ -42,27 +42,12 @@ public:
     static vector<string> astar(const Graph &graph, const string &start, const string &end);
 
     /**
-     * @brief Finds a path using Depth-First Search (DFS).
-     * @param graph The graph to traverse.
-     * @param start The starting node ID.
-     * @param end The destination node ID.
-     * @return A vector of node IDs representing the path.
-     */
-    static vector<string> dfs(const Graph &graph, const string &start, const string &end);
-
-    /**
      * @brief Calculates the total distance of a path.
      * @param path The path as a vector of node IDs.
      * @param graph The graph containing the path.
      * @return The total distance of the path.
      */
     static double totalDistance(const vector<string> &path, const Graph &graph);
-
-    /**
-     * @brief Gets the execution time of the last run algorithm
-     * @return execution time
-     */
-    static double getLastExecutionTime();
 
 private:
     /**
@@ -75,8 +60,6 @@ private:
             return p1.second > p2.second;
         }
     };
-
-    static double lastExecutionTime;
 };
 
 #endif

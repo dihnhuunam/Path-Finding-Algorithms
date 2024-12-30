@@ -61,7 +61,7 @@ sudo apt install build-essential cmake ninja-build graphviz
 ## Clone Repository
 
 ```bash
-git clone https://github.com/newt2105/dsa-20241.git
+git clone https://github.com/dihnhuunam/Path-Finding-Algorithms.git
 ```
 
 ## Compile and Run
@@ -82,8 +82,6 @@ ninja
 ```bash
 ./PathFinding
 ```
-
-## Test
 
 ## Notes
 

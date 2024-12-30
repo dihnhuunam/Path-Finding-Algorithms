@@ -3,11 +3,12 @@
 #include "ultis.h"
 #include "graph.h"
 #include <iostream>
-#include <limits>
-#include <algorithm>
 #include <iomanip>
+#include <limits>
 #include <fstream>
 #include <sstream>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -34,7 +35,7 @@ void Application::clearScreen()
 void Application::waitForEnter()
 {
     cout << "\nPress Enter to return to the main menu...";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
 }
 
 /**
@@ -67,19 +68,6 @@ void Application::displayMenu()
 }
 
 /**
- * @brief Calculates the simple Euclidean distance between two points.
- * @param x1 Latitude of the first point.
- * @param y1 Longitude of the first point.
- * @param x2 Latitude of the second point.
- * @param y2 Longitude of the second point.
- * @return The Euclidean distance between the two points.
- */
-double simpleDistance(double x1, double y1, double x2, double y2)
-{
-    return std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
-}
-
-/**
  * @brief Adds a new location to the map, connects it to another location, and saves the updates.
  */
 void Application::addNewLocation()
@@ -92,57 +80,67 @@ void Application::addNewLocation()
     string id;
     double x, y;
 
-    cout << "Enter location ID (no spaces): ";
-    getline(cin, id);
+    while (true)
+    {
+        cout << "Enter location ID (no spaces): ";
+        getline(cin, id);
 
-    if (id.find(' ') != string::npos)
-    {
-        ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Error: Location ID cannot contain spaces!"});
-        errorTable.WriteTable(Align::Center);
-        return;
-    }
+        if (id.find(' ') != string::npos)
+        {
+            ConsoleTable errorTable(1);
+            errorTable.AddNewRow({"Error: Location ID cannot contain spaces! Please try again."});
+            errorTable.WriteTable(Align::Center);
+            continue;
+        }
 
-    if (isValidLocation(id))
-    {
-        ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Error: Location ID already exists!"});
-        errorTable.WriteTable(Align::Center);
-        return;
-    }
-
-    cout << "Enter latitude (x coordinate): ";
-    string xInput;
-    getline(cin, xInput);
-    try
-    {
-        x = stod(xInput);
-        if (x < -90 || x > 90)
-            throw out_of_range("Latitude must be between -90 and 90");
-    }
-    catch (const exception &e)
-    {
-        ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Error: Invalid latitude! " + string(e.what())});
-        errorTable.WriteTable(Align::Center);
-        return;
+        if (isValidLocation(id))
+        {
+            ConsoleTable errorTable(1);
+            errorTable.AddNewRow({"Error: Location ID already exists! Please try again."});
+            errorTable.WriteTable(Align::Center);
+            continue;
+        }
+        break;
     }
 
-    cout << "Enter longitude (y coordinate): ";
-    string yInput;
-    getline(cin, yInput);
-    try
+    while (true)
     {
-        y = stod(yInput);
-        if (y < -180 || y > 180)
-            throw out_of_range("Longitude must be between -180 and 180");
+        cout << "Enter latitude (x coordinate): ";
+        string xInput;
+        getline(cin, xInput);
+        try
+        {
+            x = stod(xInput);
+            if (x < -90 || x > 90)
+                throw out_of_range("Latitude must be between -90 and 90");
+            break;
+        }
+        catch (const exception &e)
+        {
+            ConsoleTable errorTable(1);
+            errorTable.AddNewRow({"Error: Invalid latitude! " + string(e.what()) + " Please try again."});
+            errorTable.WriteTable(Align::Center);
+        }
     }
-    catch (const exception &e)
+
+    while (true)
     {
-        ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Error: Invalid longitude! " + string(e.what())});
-        errorTable.WriteTable(Align::Center);
-        return;
+        cout << "Enter longitude (y coordinate): ";
+        string yInput;
+        getline(cin, yInput);
+        try
+        {
+            y = stod(yInput);
+            if (y < -180 || y > 180)
+                throw out_of_range("Longitude must be between -180 and 180");
+            break;
+        }
+        catch (const exception &e)
+        {
+            ConsoleTable errorTable(1);
+            errorTable.AddNewRow({"Error: Invalid longitude! " + string(e.what()) + " Please try again."});
+            errorTable.WriteTable(Align::Center);
+        }
     }
 
     Node newNode = {id, x, y};
@@ -155,7 +153,7 @@ void Application::addNewLocation()
 
     for (const auto &node : nodes)
     {
-        double distance = simpleDistance(newNode.x, newNode.y, node.x, node.y);
+        double distance = Algorithms::calculateDistance(newNode, node);
         distances.push_back({node.id, distance});
 
         stringstream coords;
@@ -169,99 +167,98 @@ void Application::addNewLocation()
 
     locationTable.WriteTable(Align::Left);
 
-    sort(distances.begin(), distances.end(),
-         [](const pair<string, double> &a, const pair<string, double> &b)
-         {
-             return a.second < b.second;
-         });
-
-    cout << "\nNearest location: " << distances[0].first
-         << " (Distance: " << fixed << setprecision(2) << distances[0].second << " km)\n";
-
-    string connectTo;
-    cout << "\nEnter ID of location to connect to: ";
-    getline(cin, connectTo);
-
-    if (!isValidLocation(connectTo))
+    int numConnections;
+    while (true)
     {
-        ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Error: Invalid connection location!"});
-        errorTable.WriteTable(Align::Center);
-        return;
-    }
-
-    auto it = find_if(distances.begin(), distances.end(),
-                      [&connectTo](const pair<string, double> &p)
-                      {
-                          return p.first == connectTo;
-                      });
-    double calculatedDistance = it->second;
-
-    cout << "Calculated distance to " << connectTo << ": "
-         << fixed << setprecision(2) << calculatedDistance << " km\n";
-
-    cout << "Use calculated distance? (1 for yes, 0 for no): ";
-    string useCalculatedInput;
-    getline(cin, useCalculatedInput);
-
-    double weight;
-    if (useCalculatedInput == "1")
-    {
-        weight = calculatedDistance;
-    }
-    else
-    {
-        cout << "Enter custom distance (in km): ";
-        string weightInput;
-        getline(cin, weightInput);
+        cout << "\nEnter number of locations to connect to: ";
+        string numConnectionsInput;
+        getline(cin, numConnectionsInput);
         try
         {
-            weight = stod(weightInput);
-            if (weight <= 0)
-                throw invalid_argument("Distance must be positive");
+            numConnections = stoi(numConnectionsInput);
+            if (numConnections <= 0 || numConnections > nodes.size())
+                throw out_of_range("Number must be between 1 and " + to_string(nodes.size()));
+            break;
         }
         catch (const exception &e)
         {
             ConsoleTable errorTable(1);
-            errorTable.AddNewRow({"Error: Invalid distance! " + string(e.what())});
+            errorTable.AddNewRow({"Error: Invalid number! " + string(e.what()) + " Please try again."});
             errorTable.WriteTable(Align::Center);
-            return;
         }
     }
 
-    cout << "Is this a one-way connection? (1 for yes, 0 for no): ";
-    string directionInput;
-    getline(cin, directionInput);
-    int direction;
-    try
-    {
-        direction = stoi(directionInput);
-        if (direction != 0 && direction != 1)
-            throw invalid_argument("Invalid direction");
-    }
-    catch (...)
-    {
-        ConsoleTable errorTable(1);
-        errorTable.AddNewRow({"Error: Invalid direction! Must be 0 or 1."});
-        errorTable.WriteTable(Align::Center);
-        return;
-    }
+    vector<tuple<string, int, double>> connections;
 
-    try
+    for (int i = 0; i < numConnections; i++)
     {
-        // Add new node and edge
-        hanoiMap.addNode(id, x, y);
-        hanoiMap.addEdge(id, connectTo, direction == 1, weight);
-        if (direction == 0)
+        cout << "\nConnection " << (i + 1) << ":\n";
+        string connectTo;
+
+        while (true)
         {
-            hanoiMap.addEdge(connectTo, id, true, weight);
+            cout << "Enter ID of location to connect to: ";
+            getline(cin, connectTo);
+
+            if (!isValidLocation(connectTo))
+            {
+                ConsoleTable errorTable(1);
+                errorTable.AddNewRow({"Error: Invalid location! Please try again."});
+                errorTable.WriteTable(Align::Center);
+                continue;
+            }
+            break;
         }
 
-        // Save to file and redraw
+        auto it = find_if(distances.begin(), distances.end(),
+                          [&connectTo](const pair<string, double> &p)
+                          {
+                              return p.first == connectTo;
+                          });
+        double calculatedDistance = it->second;
+
+        cout << "Calculated distance to " << connectTo << ": "
+             << fixed << setprecision(2) << calculatedDistance << " km\n";
+
+        int direction;
+        while (true)
+        {
+            cout << "Type of direction (0 for two-way, 1 for one-way): ";
+            string directionInput;
+            getline(cin, directionInput);
+            try
+            {
+                direction = stoi(directionInput);
+                if (direction != 0 && direction != 1)
+                    throw invalid_argument("Must be 0 or 1");
+                break;
+            }
+            catch (...)
+            {
+                ConsoleTable errorTable(1);
+                errorTable.AddNewRow({"Error: Invalid direction! Must be 0 or 1. Please try again."});
+                errorTable.WriteTable(Align::Center);
+            }
+        }
+
+        connections.push_back({connectTo, direction, calculatedDistance});
+    }
+
+    try
+    {
+        hanoiMap.addNode(id, x, y);
+
+        for (const auto &[connectTo, direction, weight] : connections)
+        {
+            hanoiMap.addEdge(id, connectTo, direction == 1, weight);
+            if (direction == 0)
+            {
+                hanoiMap.addEdge(connectTo, id, true, weight);
+            }
+        }
+
         hanoiMap.saveToFile();
         hanoiMap.draw();
-
-        // Reload the graph from file
         hanoiMap = Graph();
 
         ConsoleTable successTable(1);
@@ -395,12 +392,22 @@ void Application::findPath(const string &algorithm, const string &source, const 
         stringstream distanceStr;
         distanceStr << fixed << setprecision(1) << distance << " km";
 
+        double execTime = Algorithms::getLastExecutionTime();
+        stringstream timeStr;
+        timeStr << fixed << setprecision(2) << execTime << " ms";
+
         resultTable.AddNewRow({"Path: " + pathStr});
         resultTable.AddNewRow({"Total Distance: " + distanceStr.str()});
+        resultTable.AddNewRow({"Execution Time: " + timeStr.str()});
     }
     else
     {
         resultTable.AddNewRow({"No valid path found!"});
+
+        double execTime = Algorithms::getLastExecutionTime();
+        stringstream timeStr;
+        timeStr << fixed << setprecision(2) << execTime << " ms";
+        resultTable.AddNewRow({"Execution Time: " + timeStr.str()});
     }
 
     resultTable.WriteTable(Align::Left);

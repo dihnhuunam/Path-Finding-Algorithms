@@ -4,13 +4,7 @@
 #include "graph.h"
 #include <vector>
 #include <string>
-#include <unordered_map>
-#include <queue>
-#include <unordered_set>
-#include <cmath>
-#include <algorithm>
-#include <iostream>
-#include <iomanip>
+#include <chrono>
 
 using namespace std;
 
@@ -22,10 +16,10 @@ class Algorithms
 {
 public:
     /**
-     * @brief Calculates the Euclidean distance between two nodes.
-     * @param node1 The first node.
-     * @param node2 The second node.
-     * @return The distance between node1 and node2.
+     * @brief Calculates the great-circle distance between two geographical points using the Haversine formula
+     * @param node1 First geographical point (latitude/longitude)
+     * @param node2 Second geographical point (latitude/longitude)
+     * @return Distance in kilometers between the two points
      */
     static double calculateDistance(const Node &node1, const Node &node2);
 
@@ -57,20 +51,18 @@ public:
     static vector<string> dfs(const Graph &graph, const string &start, const string &end);
 
     /**
-     * @brief Displays the path and its details.
-     * @param path The path to display as a vector of node IDs.
-     * @param algorithm The algorithm used to find the path.
-     * @param graph The graph containing the path.
-     */
-    static void displayPath(const vector<string> &path, const string &algorithm, const Graph &graph);
-
-    /**
      * @brief Calculates the total distance of a path.
      * @param path The path as a vector of node IDs.
      * @param graph The graph containing the path.
      * @return The total distance of the path.
      */
     static double totalDistance(const vector<string> &path, const Graph &graph);
+
+    /**
+     * @brief Gets the execution time of the last run algorithm
+     * @return execution time
+     */
+    static double getLastExecutionTime();
 
 private:
     /**
@@ -83,6 +75,8 @@ private:
             return p1.second > p2.second;
         }
     };
+
+    static double lastExecutionTime;
 };
 
 #endif

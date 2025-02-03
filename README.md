@@ -118,7 +118,7 @@ git clone https://github.com/dihnhuunam/Path-Finding-Algorithms.git
 ```bash
 cmake --preset=cpp-x86_64-release
 cd ./out/build/cpp-x86_64-release
-ninja
+make
 ```
 
 ### Run

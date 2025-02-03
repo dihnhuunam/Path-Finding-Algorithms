@@ -11,7 +11,7 @@
             "displayName": "Cpp-Debugger with Ninja for linux-x86_64",
             "description": "Using compilers: C = /usr/bin/gcc-13, CXX = /usr/bin/g++-13",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "generator": "Ninja",
+            "generator": "Unix Makefiles",
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++-13",
@@ -23,7 +23,7 @@
             "displayName": "Cpp-Releaser with Ninja for linux-x86_64",
             "description": "Using compilers: C = /usr/bin/gcc-13, CXX = /usr/bin/g++-13",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "generator": "Ninja",
+            "generator": "Unix Makefiles",
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++-13",
